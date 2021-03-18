@@ -46,14 +46,11 @@ class ShowCaseWidget extends StatefulWidget {
   });
 
   static activeTargetWidget(BuildContext context) {
-    return context
-        .dependOnInheritedWidgetOfExactType<_InheritedShowCaseView>()
-        .activeWidgetIds;
+    return context.dependOnInheritedWidgetOfExactType<_InheritedShowCaseView>().activeWidgetIds;
   }
 
   static ShowCaseWidgetState of(BuildContext context) {
-    ShowCaseWidgetState state =
-        context.findAncestorStateOfType<ShowCaseWidgetState>();
+    ShowCaseWidgetState state = context.findAncestorStateOfType<ShowCaseWidgetState>();
     if (state != null) {
       return context.findAncestorStateOfType<ShowCaseWidgetState>();
     } else {
@@ -145,6 +142,5 @@ class _InheritedShowCaseView extends InheritedWidget {
   }) : super(child: child);
 
   @override
-  bool updateShouldNotify(_InheritedShowCaseView oldWidget) =>
-      oldWidget.activeWidgetIds != activeWidgetIds;
+  bool updateShouldNotify(_InheritedShowCaseView oldWidget) => oldWidget.activeWidgetIds != activeWidgetIds;
 }

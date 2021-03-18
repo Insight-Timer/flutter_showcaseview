@@ -35,8 +35,7 @@ class GetPosition {
     RenderBox box = key.currentContext.findRenderObject();
 
     final topLeft = box.size.topLeft(box.localToGlobal(const Offset(0.0, 0.0)));
-    final bottomRight =
-        box.size.bottomRight(box.localToGlobal(const Offset(0.0, 0.0)));
+    final bottomRight = box.size.bottomRight(box.localToGlobal(const Offset(0.0, 0.0)));
 
     Rect rect = Rect.fromLTRB(
       topLeft.dx,
@@ -50,8 +49,7 @@ class GetPosition {
   ///Get the bottom position of the widget
   double getBottom() {
     RenderBox box = key.currentContext.findRenderObject();
-    final bottomRight =
-        box.size.bottomRight(box.localToGlobal(const Offset(0.0, 0.0)));
+    final bottomRight = box.size.bottomRight(box.localToGlobal(const Offset(0.0, 0.0)));
     return bottomRight.dy;
   }
 
@@ -72,8 +70,7 @@ class GetPosition {
   ///Get the right position of the widget
   double getRight() {
     RenderBox box = key.currentContext.findRenderObject();
-    final bottomRight =
-        box.size.bottomRight(box.localToGlobal(const Offset(0.0, 0.0)));
+    final bottomRight = box.size.bottomRight(box.localToGlobal(const Offset(0.0, 0.0)));
     return bottomRight.dx;
   }
 
