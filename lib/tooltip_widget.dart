@@ -38,7 +38,6 @@ class ToolTipWidget extends StatefulWidget {
   final Size screenSize;
   final String title;
   final String description;
-  final Animation<double> animationOffset;
   final TextStyle titleTextStyle;
   final TextStyle descTextStyle;
   final Widget container;
@@ -58,7 +57,6 @@ class ToolTipWidget extends StatefulWidget {
       this.screenSize,
       this.title,
       this.description,
-      this.animationOffset,
       this.titleTextStyle,
       this.descTextStyle,
       this.container,
@@ -190,54 +188,45 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
             right: _getRight(),
             child: FractionalTranslation(
               translation: Offset(0.0, contentFractionalOffset),
-              child: SlideTransition(
-                position: Tween<Offset>(
-                  begin: Offset(0.0, contentFractionalOffset / 10),
-                  end: Offset(0.0, 0.100),
-                ).animate(widget.animationOffset),
-                child: Material(
-                  color: Colors.transparent,
-                  child: Container(
-                    padding: EdgeInsets.only(top: paddingTop, bottom: paddingBottom),
-                    child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
-                      child: GestureDetector(
-                        onTap: widget.onTooltipTap,
-                        child: Container(
-                          width: _getTooltipWidth(),
-                          padding: widget.contentPadding,
-                          color: widget.tooltipColor,
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.center,
-                            children: <Widget>[
-                              Container(
-                                child: Column(
-                                  crossAxisAlignment:
-                                      widget.title != null ? CrossAxisAlignment.start : CrossAxisAlignment.center,
-                                  children: <Widget>[
-                                    widget.title != null
-                                        ? Text(
-                                            widget.title,
-                                            style: widget.titleTextStyle ??
-                                                Theme.of(context)
-                                                    .textTheme
-                                                    .headline6
-                                                    .merge(TextStyle(color: widget.textColor)),
-                                          )
-                                        : Container(),
-                                    Text(
-                                      widget.description,
-                                      style: widget.descTextStyle ??
-                                          Theme.of(context)
-                                              .textTheme
-                                              .subtitle2
-                                              .merge(TextStyle(color: widget.textColor)),
-                                    ),
-                                  ],
-                                ),
-                              )
-                            ],
-                          ),
+              child: Material(
+                color: Colors.transparent,
+                child: Container(
+                  padding: EdgeInsets.only(top: paddingTop, bottom: paddingBottom),
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(8),
+                    child: GestureDetector(
+                      onTap: widget.onTooltipTap,
+                      child: Container(
+                        width: _getTooltipWidth(),
+                        padding: widget.contentPadding,
+                        color: widget.tooltipColor,
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          children: <Widget>[
+                            Container(
+                              child: Column(
+                                crossAxisAlignment:
+                                    widget.title != null ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+                                children: <Widget>[
+                                  widget.title != null
+                                      ? Text(
+                                          widget.title,
+                                          style: widget.titleTextStyle ??
+                                              Theme.of(context)
+                                                  .textTheme
+                                                  .headline6
+                                                  .merge(TextStyle(color: widget.textColor)),
+                                        )
+                                      : Container(),
+                                  Text(
+                                    widget.description,
+                                    style: widget.descTextStyle ??
+                                        Theme.of(context).textTheme.subtitle2.merge(TextStyle(color: widget.textColor)),
+                                  ),
+                                ],
+                              ),
+                            )
+                          ],
                         ),
                       ),
                     ),
@@ -293,16 +282,10 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
       left: widget.position.getCenter() - 24,
       child: FractionalTranslation(
         translation: Offset(0.0, contentFractionalOffset),
-        child: SlideTransition(
-          position: Tween<Offset>(
-            begin: Offset(0.0, contentFractionalOffset / 5),
-            end: Offset(0.0, 0.150),
-          ).animate(widget.animationOffset),
-          child: Icon(
-            ToolTipWidget.isArrowUp ? Icons.arrow_drop_up : Icons.arrow_drop_down,
-            color: widget.tooltipColor,
-            size: 50,
-          ),
+        child: Icon(
+          ToolTipWidget.isArrowUp ? Icons.arrow_drop_up : Icons.arrow_drop_down,
+          color: widget.tooltipColor,
+          size: 50,
         ),
       ),
     );

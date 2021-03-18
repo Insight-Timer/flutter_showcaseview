@@ -24,11 +24,9 @@ class Showcase extends StatefulWidget {
   final bool showArrow;
   final double height;
   final double width;
-  final Duration animationDuration;
   final VoidCallback onToolTipClick;
   final VoidCallback onTargetClick;
   final bool disposeOnTap;
-  final bool disableAnimation;
   final ArrowType type;
 
   const Showcase({
@@ -46,8 +44,6 @@ class Showcase extends StatefulWidget {
     this.showArrow = true,
     this.onTargetClick,
     this.disposeOnTap,
-    this.animationDuration = const Duration(milliseconds: 2000),
-    this.disableAnimation = false,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
     this.onToolTipClick,
     this.type = ArrowType.up,
@@ -70,8 +66,7 @@ class Showcase extends StatefulWidget {
             descTextStyle != null ||
             showcaseBackgroundColor != null ||
             textColor != null ||
-            shapeBorder != null ||
-            animationDuration != null);
+            shapeBorder != null);
 
   const Showcase.withWidget({
     this.key,
@@ -90,8 +85,6 @@ class Showcase extends StatefulWidget {
     this.textColor = Colors.black,
     this.onTargetClick,
     this.disposeOnTap,
-    this.animationDuration = const Duration(milliseconds: 2000),
-    this.disableAnimation = false,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
     this.type = ArrowType.up,
   })  : this.showArrow = false,
@@ -107,17 +100,14 @@ class Showcase extends StatefulWidget {
             descTextStyle != null ||
             showcaseBackgroundColor != null ||
             textColor != null ||
-            shapeBorder != null ||
-            animationDuration != null);
+            shapeBorder != null);
 
   @override
   _ShowcaseState createState() => _ShowcaseState();
 }
 
-class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
+class _ShowcaseState extends State<Showcase> {
   bool _showShowCase = false;
-  Animation<double> _slideAnimation;
-  AnimationController _slideAnimationController;
   Timer timer;
   GetPosition position;
 
@@ -125,31 +115,11 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
   void initState() {
     super.initState();
 
-    _slideAnimationController = AnimationController(
-      duration: widget.animationDuration,
-      vsync: this,
-    )..addStatusListener((AnimationStatus status) {
-        if (status == AnimationStatus.completed) {
-          _slideAnimationController.reverse();
-        }
-        if (_slideAnimationController.isDismissed) {
-          if (!widget.disableAnimation) {
-            _slideAnimationController.forward();
-          }
-        }
-      });
-
-    _slideAnimation = CurvedAnimation(
-      parent: _slideAnimationController,
-      curve: Curves.easeInOut,
-    );
-
     position = GetPosition(key: widget.key);
   }
 
   @override
   void dispose() {
-    _slideAnimationController.dispose();
     super.dispose();
   }
 
@@ -169,7 +139,6 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
     });
 
     if (activeStep == widget.key) {
-      _slideAnimationController.forward();
       if (ShowCaseWidget.of(context).autoPlay) {
         timer = Timer(Duration(seconds: ShowCaseWidget.of(context).autoPlayDelay.inSeconds), () {
           _nextIfAny();
@@ -199,9 +168,6 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
       timer = null;
     }
     ShowCaseWidget.of(context).completed(widget.key);
-    if (!widget.disableAnimation) {
-      _slideAnimationController.forward();
-    }
   }
 
   void _getOnTargetTap() {
@@ -255,7 +221,6 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
               screenSize: screenSize,
               title: widget.title,
               description: widget.description,
-              animationOffset: _slideAnimation,
               titleTextStyle: widget.titleTextStyle,
               descTextStyle: widget.descTextStyle,
               container: widget.container,
