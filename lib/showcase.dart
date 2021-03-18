@@ -127,7 +127,7 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
 
     _slideAnimationController = AnimationController(
       duration: widget.animationDuration,
-      value: this,
+      vsync: this,
     )..addStatusListener((AnimationStatus status) {
         if (status == AnimationStatus.completed) {
           _slideAnimationController.reverse();
