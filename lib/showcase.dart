@@ -170,6 +170,7 @@ class _ShowcaseState extends State<Showcase> {
     ShowCaseWidget.of(context).completed(widget.key);
   }
 
+  // ignore: unused_element
   void _getOnTargetTap() {
     if (widget.disposeOnTap == true) {
       ShowCaseWidget.of(context).dismiss();
@@ -209,12 +210,6 @@ class _ShowcaseState extends State<Showcase> {
                     color: widget.overlayColor),
               ),
             ),
-            _TargetWidget(
-              offset: offset,
-              size: size,
-              onTap: _getOnTargetTap,
-              shapeBorder: widget.shapeBorder,
-            ),
             ToolTipWidget(
               position: position,
               offset: offset,
@@ -236,49 +231,6 @@ class _ShowcaseState extends State<Showcase> {
           ],
         ),
       );
-}
-
-class _TargetWidget extends StatelessWidget {
-  final Offset offset;
-  final Size size;
-  final Animation<double> widthAnimation;
-  final VoidCallback onTap;
-  final ShapeBorder shapeBorder;
-
-  _TargetWidget({
-    Key key,
-    @required this.offset,
-    this.size,
-    this.widthAnimation,
-    this.onTap,
-    this.shapeBorder,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      top: offset.dy,
-      left: offset.dx,
-      child: FractionalTranslation(
-        translation: const Offset(-0.5, -0.5),
-        child: GestureDetector(
-          onTap: onTap,
-          child: Container(
-            height: size.height + 16,
-            width: size.width + 16,
-            decoration: ShapeDecoration(
-              shape: shapeBorder ??
-                  RoundedRectangleBorder(
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(8),
-                    ),
-                  ),
-            ),
-          ),
-        ),
-      ),
-    );
-  }
 }
 
 enum ArrowType { up, down }

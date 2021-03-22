@@ -71,6 +71,7 @@ class ShowCaseWidgetState extends State<ShowCaseWidget> {
 
   @override
   void initState() {
+    // ignore: todo
     // TODO: implement initState
     super.initState();
     this.autoPlayDelay = widget.autoPlayDelay;
