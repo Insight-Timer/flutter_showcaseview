@@ -89,7 +89,7 @@ class Showcase extends StatefulWidget {
     this.textColor = Colors.black,
     this.onTargetClick,
     this.disposeOnTap,
-    this.hideTooltip,
+    this.hideTooltip = false,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
     this.type = ArrowType.up,
   })  : this.showArrow = false,
