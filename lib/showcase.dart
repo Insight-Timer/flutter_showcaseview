@@ -27,6 +27,7 @@ class Showcase extends StatefulWidget {
   final VoidCallback onToolTipClick;
   final VoidCallback onTargetClick;
   final bool disposeOnTap;
+  final bool hideTooltip;
   final ArrowType type;
 
   const Showcase({
@@ -44,6 +45,7 @@ class Showcase extends StatefulWidget {
     this.showArrow = true,
     this.onTargetClick,
     this.disposeOnTap,
+    this.hideTooltip = false,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
     this.onToolTipClick,
     this.type = ArrowType.up,
@@ -55,18 +57,20 @@ class Showcase extends StatefulWidget {
             "disposeOnTap is required if you're using onTargetClick"),
         assert(disposeOnTap == null ? true : (onTargetClick == null ? false : true),
             "onTargetClick is required if you're using disposeOnTap"),
-        assert(key != null ||
-            child != null ||
-            title != null ||
-            showArrow != null ||
-            description != null ||
-            shapeBorder != null ||
-            overlayColor != null ||
-            titleTextStyle != null ||
-            descTextStyle != null ||
-            showcaseBackgroundColor != null ||
-            textColor != null ||
-            shapeBorder != null);
+        assert(
+          key != null ||
+              child != null ||
+              title != null ||
+              showArrow != null ||
+              description != null ||
+              shapeBorder != null ||
+              overlayColor != null ||
+              titleTextStyle != null ||
+              descTextStyle != null ||
+              showcaseBackgroundColor != null ||
+              textColor != null ||
+              shapeBorder != null,
+        );
 
   const Showcase.withWidget({
     this.key,
@@ -85,6 +89,7 @@ class Showcase extends StatefulWidget {
     this.textColor = Colors.black,
     this.onTargetClick,
     this.disposeOnTap,
+    this.hideTooltip = false,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
     this.type = ArrowType.up,
   })  : this.showArrow = false,
@@ -199,15 +204,23 @@ class _ShowcaseState extends State<Showcase> {
         maintainState: true,
         child: Stack(
           children: [
-            Container(
-              width: MediaQuery.of(context).size.width,
-              height: MediaQuery.of(context).size.height,
-              child: CustomPaint(
-                painter: ShapePainter(
+            GestureDetector(
+              onTap: () {
+                if (widget.hideTooltip) {
+                  _nextIfAny();
+                }
+              },
+              child: Container(
+                width: MediaQuery.of(context).size.width,
+                height: MediaQuery.of(context).size.height,
+                child: CustomPaint(
+                  painter: ShapePainter(
                     opacity: widget.overlayOpacity,
                     rect: position.getRect(),
                     shapeBorder: widget.shapeBorder,
-                    color: widget.overlayColor),
+                    color: widget.overlayColor,
+                  ),
+                ),
               ),
             ),
             ToolTipWidget(
