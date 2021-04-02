@@ -204,14 +204,12 @@ class _ShowcaseState extends State<Showcase> {
         maintainState: true,
         child: Stack(
           children: [
-            InkWell(
+            GestureDetector(
               onTap: () {
                 if (widget.hideTooltip) {
-                  ShowCaseWidget.of(context).dismiss();
+                  _nextIfAny();
                 }
               },
-              splashColor: Colors.transparent,
-              highlightColor: Colors.transparent,
               child: Container(
                 width: MediaQuery.of(context).size.width,
                 height: MediaQuery.of(context).size.height,
