@@ -29,6 +29,7 @@ import 'dart:math';
 
 import 'package:flutter/material.dart';
 
+import '../showcaseview.dart';
 import 'get_position.dart';
 import 'measure_size.dart';
 
@@ -50,6 +51,7 @@ class ToolTipWidget extends StatefulWidget {
   static late bool isArrowUp;
   final VoidCallback? onTooltipTap;
   final EdgeInsets? contentPadding;
+  final ArrowType type;
 
   ToolTipWidget(
       {this.position,
@@ -67,7 +69,8 @@ class ToolTipWidget extends StatefulWidget {
       this.contentHeight,
       this.contentWidth,
       this.onTooltipTap,
-      this.contentPadding});
+      this.contentPadding,
+      this.type = ArrowType.down});
 
   @override
   _ToolTipWidgetState createState() => _ToolTipWidgetState();
@@ -259,7 +262,7 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
         children: <Widget>[
           Positioned(
             left: _getSpace(),
-            top: contentY - 10,
+            top: widget.type == ArrowType.up ? contentY + 6 : contentY - 10,
             child: FractionalTranslation(
               translation: Offset(0.0, contentFractionalOffset as double),
               child: SlideTransition(
