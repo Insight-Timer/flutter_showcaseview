@@ -158,7 +158,7 @@ class _ShowcaseState extends State<Showcase> {
     return AnchoredOverlay(
       overlayBuilder: (BuildContext context, Rect rectBound, Offset offset) =>
           buildOverlayOnTarget(offset, rectBound.size, rectBound, size),
-      showOverlay: true,
+      showOverlay: _showShowCase,
       child: widget.child,
     );
   }
