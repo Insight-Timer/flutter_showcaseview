@@ -87,17 +87,10 @@ class Showcase extends StatefulWidget {
   })  : height = null,
         width = null,
         container = null,
-        assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0,
-            "overlay opacity should be >= 0.0 and <= 1.0."),
-        assert(
-            onTargetClick == null
-                ? true
-                : (disposeOnTap == null ? false : true),
+        assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0, "overlay opacity should be >= 0.0 and <= 1.0."),
+        assert(onTargetClick == null ? true : (disposeOnTap == null ? false : true),
             "disposeOnTap is required if you're using onTargetClick"),
-        assert(
-            disposeOnTap == null
-                ? true
-                : (onTargetClick == null ? false : true),
+        assert(disposeOnTap == null ? true : (onTargetClick == null ? false : true),
             "onTargetClick is required if you're using disposeOnTap");
 
   const Showcase.withWidget({
@@ -124,8 +117,7 @@ class Showcase extends StatefulWidget {
     this.type = ArrowType.up,
   })  : showArrow = false,
         onToolTipClick = null,
-        assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0,
-            "overlay opacity should be >= 0.0 and <= 1.0.");
+        assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0, "overlay opacity should be >= 0.0 and <= 1.0.");
 
   @override
   _ShowcaseState createState() => _ShowcaseState();
@@ -188,10 +180,7 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
     if (activeStep == widget.key) {
       _slideAnimationController.forward();
       if (ShowCaseWidget.of(context)!.autoPlay) {
-        timer = Timer(
-            Duration(
-                seconds: ShowCaseWidget.of(context)!.autoPlayDelay.inSeconds),
-            _nextIfAny);
+        timer = Timer(Duration(seconds: ShowCaseWidget.of(context)!.autoPlayDelay.inSeconds), _nextIfAny);
       }
     }
   }
@@ -199,12 +188,14 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
   @override
   Widget build(BuildContext context) {
     final size = MediaQuery.of(context).size;
-    return AnchoredOverlay(
-      overlayBuilder: (context, rectBound, offset) =>
-          buildOverlayOnTarget(offset, rectBound.size, rectBound, size),
-      showOverlay: true,
-      child: widget.child,
-    );
+    return _showShowCase
+        ? AnchoredOverlay(
+            overlayBuilder: (context, rectBound, offset) =>
+                buildOverlayOnTarget(offset, rectBound.size, rectBound, size),
+            showOverlay: _showShowCase,
+            child: widget.child,
+          )
+        : widget.child;
   }
 
   void _nextIfAny() {
@@ -219,15 +210,6 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
     ShowCaseWidget.of(context)!.completed(widget.key);
     if (!widget.disableAnimation) {
       _slideAnimationController.forward();
-    }
-  }
-
-  void _getOnTargetTap() {
-    if (widget.disposeOnTap == true) {
-      ShowCaseWidget.of(context)!.dismiss();
-      widget.onTargetClick!();
-    } else {
-      (widget.onTargetClick ?? _nextIfAny).call();
     }
   }
 
