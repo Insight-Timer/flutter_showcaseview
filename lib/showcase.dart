@@ -155,12 +155,14 @@ class _ShowcaseState extends State<Showcase> {
   @override
   Widget build(BuildContext context) {
     Size size = MediaQuery.of(context).size;
-    return AnchoredOverlay(
-      overlayBuilder: (BuildContext context, Rect rectBound, Offset offset) =>
-          buildOverlayOnTarget(offset, rectBound.size, rectBound, size),
-      showOverlay: _showShowCase,
-      child: widget.child,
-    );
+    return _showShowCase
+        ? AnchoredOverlay(
+            overlayBuilder: (BuildContext context, Rect rectBound, Offset offset) =>
+                buildOverlayOnTarget(offset, rectBound.size, rectBound, size),
+            showOverlay: _showShowCase,
+            child: widget.child,
+          )
+        : widget.child;
   }
 
   void _nextIfAny() {
