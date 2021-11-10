@@ -167,8 +167,7 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
       }
     }
 
-    _controller.value = 0;
-    _controller.forward();
+    WidgetsBinding.instance.addPostFrameCallback((_) => _controller.forward(from: 0));
   }
 
   void hideOverlay(VoidCallback callback) {
