@@ -29,6 +29,7 @@ class Showcase extends StatefulWidget {
   final bool disposeOnTap;
   final bool hideTooltip;
   final ArrowType type;
+  final Duration animationDuration;
 
   const Showcase({
     @required this.key,
@@ -45,10 +46,11 @@ class Showcase extends StatefulWidget {
     this.showArrow = true,
     this.onTargetClick,
     this.disposeOnTap,
-    this.hideTooltip = false,
+    this.hideTooltip = true,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
     this.onToolTipClick,
     this.type = ArrowType.up,
+    this.animationDuration = const Duration(milliseconds: 200),
   })  : height = null,
         width = null,
         container = null,
@@ -89,9 +91,10 @@ class Showcase extends StatefulWidget {
     this.textColor = Colors.black,
     this.onTargetClick,
     this.disposeOnTap,
-    this.hideTooltip = false,
+    this.hideTooltip = true,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
     this.type = ArrowType.up,
+    this.animationDuration = const Duration(milliseconds: 200),
   })  : this.showArrow = false,
         this.onToolTipClick = null,
         assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0, "overlay opacity should be >= 0.0 and <= 1.0."),
@@ -111,14 +114,27 @@ class Showcase extends StatefulWidget {
   _ShowcaseState createState() => _ShowcaseState();
 }
 
-class _ShowcaseState extends State<Showcase> {
+class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
   bool _showShowCase = false;
   Timer timer;
   GetPosition position;
+  AnimationController _controller;
+  Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
+
+    _controller = AnimationController(
+      vsync: this,
+      duration: widget.animationDuration,
+      reverseDuration: widget.animationDuration,
+    );
+
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(curve: Curves.easeInCubic, parent: _controller));
 
     position = GetPosition(key: widget.key);
   }
@@ -150,6 +166,14 @@ class _ShowcaseState extends State<Showcase> {
         });
       }
     }
+
+    _controller.value = 0;
+    _controller.forward();
+  }
+
+  void hideOverlay(VoidCallback callback) {
+    _controller.reverse();
+    Future.delayed(widget.animationDuration).then((value) => callback?.call());
   }
 
   @override
@@ -174,7 +198,9 @@ class _ShowcaseState extends State<Showcase> {
     } else if (timer != null && !timer.isActive) {
       timer = null;
     }
-    ShowCaseWidget.of(context).completed(widget.key);
+    hideOverlay(() {
+      ShowCaseWidget.of(context).completed(widget.key);
+    });
   }
 
   // ignore: unused_element
@@ -204,48 +230,59 @@ class _ShowcaseState extends State<Showcase> {
         visible: _showShowCase,
         maintainAnimation: true,
         maintainState: true,
-        child: Stack(
-          children: [
-            GestureDetector(
-              onTap: () {
-                if (widget.hideTooltip) {
-                  _nextIfAny();
-                }
-              },
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: CustomPaint(
-                  painter: ShapePainter(
-                    opacity: widget.overlayOpacity,
-                    rect: position.getRect(),
-                    shapeBorder: widget.shapeBorder,
-                    color: widget.overlayColor,
+        child: AnimatedBuilder(
+            animation: _controller,
+            builder: (context, child) {
+              return Stack(
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      if (widget.hideTooltip && !_controller.isAnimating) {
+                        _nextIfAny();
+                      }
+                    },
+                    child: Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: CustomPaint(
+                        painter: ShapePainter(
+                          opacity: widget.overlayOpacity,
+                          rect: scaleRect(position.getRect(), _animation.value),
+                          shapeBorder: widget.shapeBorder,
+                          color: widget.overlayColor.withOpacity(_animation.value),
+                        ),
+                      ),
+                    ),
                   ),
-                ),
-              ),
-            ),
-            ToolTipWidget(
-              position: position,
-              offset: offset,
-              screenSize: screenSize,
-              title: widget.title,
-              description: widget.description,
-              titleTextStyle: widget.titleTextStyle,
-              descTextStyle: widget.descTextStyle,
-              container: widget.container,
-              tooltipColor: widget.showcaseBackgroundColor,
-              textColor: widget.textColor,
-              showArrow: widget.showArrow,
-              contentHeight: widget.height,
-              contentWidth: widget.width,
-              onTooltipTap: _getOnTooltipTap,
-              contentPadding: widget.contentPadding,
-              type: widget.type,
-            ),
-          ],
-        ),
+                  Opacity(
+                    opacity: _animation.value,
+                    child: ToolTipWidget(
+                      position: position,
+                      offset: offset,
+                      screenSize: screenSize,
+                      title: widget.title,
+                      description: widget.description,
+                      titleTextStyle: widget.titleTextStyle,
+                      descTextStyle: widget.descTextStyle,
+                      container: widget.container,
+                      tooltipColor: widget.showcaseBackgroundColor,
+                      textColor: widget.textColor,
+                      showArrow: widget.showArrow,
+                      contentHeight: widget.height,
+                      contentWidth: widget.width,
+                      onTooltipTap: _getOnTooltipTap,
+                      contentPadding: widget.contentPadding,
+                      type: widget.type,
+                    ),
+                  ),
+                ],
+              );
+            }),
       );
+
+  Rect scaleRect(Rect rect, double scale) {
+    return Rect.fromCenter(center: rect.center, width: rect.width * scale, height: rect.height * scale);
+  }
 }
 
 enum ArrowType { up, down }
