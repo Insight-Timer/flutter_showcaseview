@@ -229,18 +229,18 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
         visible: _showShowCase,
         maintainAnimation: true,
         maintainState: true,
-        child: AnimatedBuilder(
-            animation: _controller,
-            builder: (context, child) {
-              return Stack(
-                children: [
-                  GestureDetector(
-                    onTap: () {
-                      if (widget.hideTooltip && !_controller.isAnimating) {
-                        _nextIfAny();
-                      }
-                    },
-                    child: Container(
+        child: Stack(
+          children: [
+            GestureDetector(
+              onTap: () {
+                if (widget.hideTooltip && !_controller.isAnimating) {
+                  _nextIfAny();
+                }
+              },
+              child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, _) {
+                    return Container(
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height,
                       child: CustomPaint(
@@ -251,32 +251,32 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
                           color: widget.overlayColor.withOpacity(_animation.value),
                         ),
                       ),
-                    ),
-                  ),
-                  Opacity(
-                    opacity: _animation.value,
-                    child: ToolTipWidget(
-                      position: position,
-                      offset: offset,
-                      screenSize: screenSize,
-                      title: widget.title,
-                      description: widget.description,
-                      titleTextStyle: widget.titleTextStyle,
-                      descTextStyle: widget.descTextStyle,
-                      container: widget.container,
-                      tooltipColor: widget.showcaseBackgroundColor,
-                      textColor: widget.textColor,
-                      showArrow: widget.showArrow,
-                      contentHeight: widget.height,
-                      contentWidth: widget.width,
-                      onTooltipTap: _getOnTooltipTap,
-                      contentPadding: widget.contentPadding,
-                      type: widget.type,
-                    ),
-                  ),
-                ],
-              );
-            }),
+                    );
+                  }),
+            ),
+            FadeTransition(
+              opacity: _animation,
+              child: ToolTipWidget(
+                position: position,
+                offset: offset,
+                screenSize: screenSize,
+                title: widget.title,
+                description: widget.description,
+                titleTextStyle: widget.titleTextStyle,
+                descTextStyle: widget.descTextStyle,
+                container: widget.container,
+                tooltipColor: widget.showcaseBackgroundColor,
+                textColor: widget.textColor,
+                showArrow: widget.showArrow,
+                contentHeight: widget.height,
+                contentWidth: widget.width,
+                onTooltipTap: _getOnTooltipTap,
+                contentPadding: widget.contentPadding,
+                type: widget.type,
+              ),
+            ),
+          ],
+        ),
       );
 
   Rect scaleRect(Rect rect, double scale) {
