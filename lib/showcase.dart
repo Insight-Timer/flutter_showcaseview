@@ -141,6 +141,7 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
 
   @override
   void dispose() {
+    _controller.dispose();
     super.dispose();
   }
 
