@@ -1,35 +1,7 @@
-/*
- * Copyright © 2020, Simform Solutions
- * All rights reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
- *
- * 1. Redistributions of source code must retain the above copyright notice,
- *    this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright notice,
- *    this list of conditions and the following disclaimer in the documentation
- *    and/or other materials provided with the distribution.
- *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
- * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
- * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
- * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
- * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
- * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
- * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
- * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
- * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
- * POSSIBILITY OF SUCH DAMAGE.
- */
-
 import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-
 import 'custom_paint.dart';
 import 'get_position.dart';
 import 'layout_overlays.dart';
@@ -37,9 +9,6 @@ import 'showcase_widget.dart';
 import 'tooltip_widget.dart';
 
 class Showcase extends StatefulWidget {
-  @override
-  final GlobalKey? key;
-
   final Widget child;
   final String? title;
   final String? description;
@@ -47,21 +16,21 @@ class Showcase extends StatefulWidget {
   final TextStyle? titleTextStyle;
   final TextStyle? descTextStyle;
   final EdgeInsets contentPadding;
+  final GlobalKey key;
   final Color overlayColor;
   final double overlayOpacity;
   final Widget? container;
   final Color showcaseBackgroundColor;
   final Color textColor;
-  final bool showArrow;
+  final bool? showArrow;
   final double? height;
   final double? width;
-  final Duration animationDuration;
   final VoidCallback? onToolTipClick;
   final VoidCallback? onTargetClick;
   final bool? disposeOnTap;
-  final bool disableAnimation;
   final bool hideTooltip;
   final ArrowType type;
+  final Duration animationDuration;
 
   const Showcase({
     required this.key,
@@ -78,12 +47,11 @@ class Showcase extends StatefulWidget {
     this.showArrow = true,
     this.onTargetClick,
     this.disposeOnTap,
-    this.animationDuration = const Duration(milliseconds: 2000),
-    this.disableAnimation = false,
+    this.hideTooltip = true,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
     this.onToolTipClick,
-    this.hideTooltip = false,
     this.type = ArrowType.up,
+    this.animationDuration = const Duration(milliseconds: 200),
   })  : height = null,
         width = null,
         container = null,
@@ -91,10 +59,19 @@ class Showcase extends StatefulWidget {
         assert(onTargetClick == null ? true : (disposeOnTap == null ? false : true),
             "disposeOnTap is required if you're using onTargetClick"),
         assert(disposeOnTap == null ? true : (onTargetClick == null ? false : true),
-            "onTargetClick is required if you're using disposeOnTap");
+            "onTargetClick is required if you're using disposeOnTap"),
+        assert(
+          title != null ||
+              showArrow != null ||
+              description != null ||
+              shapeBorder != null ||
+              titleTextStyle != null ||
+              descTextStyle != null ||
+              shapeBorder != null,
+        );
 
   const Showcase.withWidget({
-    this.key,
+    required this.key,
     required this.child,
     required this.container,
     required this.height,
@@ -110,14 +87,18 @@ class Showcase extends StatefulWidget {
     this.textColor = Colors.black,
     this.onTargetClick,
     this.disposeOnTap,
-    this.animationDuration = const Duration(milliseconds: 2000),
-    this.disableAnimation = false,
+    this.hideTooltip = true,
     this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
-    this.hideTooltip = false,
     this.type = ArrowType.up,
+    this.animationDuration = const Duration(milliseconds: 200),
   })  : showArrow = false,
         onToolTipClick = null,
-        assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0, "overlay opacity should be >= 0.0 and <= 1.0.");
+        assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0, "overlay opacity should be >= 0.0 and <= 1.0."),
+        assert(title != null ||
+            description != null ||
+            shapeBorder != null ||
+            titleTextStyle != null ||
+            descTextStyle != null);
 
   @override
   _ShowcaseState createState() => _ShowcaseState();
@@ -125,40 +106,32 @@ class Showcase extends StatefulWidget {
 
 class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
   bool _showShowCase = false;
-  Animation<double>? _slideAnimation;
-  late AnimationController _slideAnimationController;
   Timer? timer;
-  GetPosition? position;
+  late GetPosition position;
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
   void initState() {
     super.initState();
 
-    _slideAnimationController = AnimationController(
-      duration: widget.animationDuration,
+    _controller = AnimationController(
       vsync: this,
-    )..addStatusListener((status) {
-        if (status == AnimationStatus.completed) {
-          _slideAnimationController.reverse();
-        }
-        if (_slideAnimationController.isDismissed) {
-          if (!widget.disableAnimation) {
-            _slideAnimationController.forward();
-          }
-        }
-      });
-
-    _slideAnimation = CurvedAnimation(
-      parent: _slideAnimationController,
-      curve: Curves.easeInOut,
+      duration: widget.animationDuration,
+      reverseDuration: widget.animationDuration,
     );
+
+    _animation = Tween<double>(
+      begin: 0.0,
+      end: 1.0,
+    ).animate(CurvedAnimation(curve: Curves.easeInCubic, parent: _controller));
 
     position = GetPosition(key: widget.key);
   }
 
   @override
   void dispose() {
-    _slideAnimationController.dispose();
+    _controller.dispose();
     super.dispose();
   }
 
@@ -178,11 +151,20 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
     });
 
     if (activeStep == widget.key) {
-      _slideAnimationController.forward();
-      if (ShowCaseWidget.of(context)!.autoPlay) {
-        timer = Timer(Duration(seconds: ShowCaseWidget.of(context)!.autoPlayDelay.inSeconds), _nextIfAny);
+      final showCaseWidget = ShowCaseWidget.of(context);
+      if (showCaseWidget != null && showCaseWidget.autoPlay) {
+        timer = Timer(Duration(seconds: showCaseWidget.autoPlayDelay.inSeconds), () {
+          _nextIfAny();
+        });
       }
     }
+
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _controller.forward(from: 0));
+  }
+
+  void hideOverlay(VoidCallback? callback) {
+    _controller.reverse();
+    Future<void>.delayed(widget.animationDuration).then((_) => callback?.call());
   }
 
   @override
@@ -190,7 +172,7 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
     final size = MediaQuery.of(context).size;
     return _showShowCase
         ? AnchoredOverlay(
-            overlayBuilder: (context, rectBound, offset) =>
+            overlayBuilder: (BuildContext context, Rect rectBound, Offset offset) =>
                 buildOverlayOnTarget(offset, rectBound.size, rectBound, size),
             showOverlay: _showShowCase,
             child: widget.child,
@@ -200,22 +182,32 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
 
   void _nextIfAny() {
     if (timer != null && timer!.isActive) {
-      if (ShowCaseWidget.of(context)!.autoPlayLockEnable) {
+      final showcaseWidget = ShowCaseWidget.of(context);
+      if (showcaseWidget != null && showcaseWidget.autoPlayLockEnable) {
         return;
       }
-      timer!.cancel();
+      timer?.cancel();
     } else if (timer != null && !timer!.isActive) {
       timer = null;
     }
-    ShowCaseWidget.of(context)!.completed(widget.key);
-    if (!widget.disableAnimation) {
-      _slideAnimationController.forward();
+    hideOverlay(() {
+      ShowCaseWidget.of(context)?.completed(widget.key);
+    });
+  }
+
+  // ignore: unused_element
+  void _getOnTargetTap() {
+    if (widget.disposeOnTap == true) {
+      ShowCaseWidget.of(context)?.dismiss();
+      widget.onTargetClick?.call();
+    } else {
+      (widget.onTargetClick ?? _nextIfAny).call();
     }
   }
 
   void _getOnTooltipTap() {
     if (widget.disposeOnTap == true) {
-      ShowCaseWidget.of(context)!.dismiss();
+      ShowCaseWidget.of(context)?.dismiss();
     }
     widget.onToolTipClick?.call();
   }
@@ -234,87 +226,54 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
           children: [
             GestureDetector(
               onTap: () {
-                if (widget.hideTooltip) {
+                if (widget.hideTooltip && !_controller.isAnimating) {
                   _nextIfAny();
                 }
               },
-              child: Container(
-                width: MediaQuery.of(context).size.width,
-                height: MediaQuery.of(context).size.height,
-                child: CustomPaint(
-                  painter: ShapePainter(
-                      opacity: widget.overlayOpacity,
-                      rect: position!.getRect(),
-                      shapeBorder: widget.shapeBorder,
-                      color: widget.overlayColor),
-                ),
-              ),
+              child: AnimatedBuilder(
+                  animation: _controller,
+                  builder: (context, _) {
+                    return Container(
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height,
+                      child: CustomPaint(
+                        painter: ShapePainter(
+                          opacity: widget.overlayOpacity,
+                          rect: scaleRect(position.getRect(), _animation.value),
+                          shapeBorder: widget.shapeBorder,
+                          color: widget.overlayColor.withOpacity(_animation.value),
+                        ),
+                      ),
+                    );
+                  }),
             ),
-            ToolTipWidget(
-              position: position,
-              offset: offset,
-              screenSize: screenSize,
-              title: widget.title,
-              description: widget.description,
-              animationOffset: _slideAnimation,
-              titleTextStyle: widget.titleTextStyle,
-              descTextStyle: widget.descTextStyle,
-              container: widget.container,
-              tooltipColor: widget.showcaseBackgroundColor,
-              textColor: widget.textColor,
-              showArrow: widget.showArrow,
-              contentHeight: widget.height,
-              contentWidth: widget.width,
-              onTooltipTap: _getOnTooltipTap,
-              contentPadding: widget.contentPadding,
-              type: widget.type,
+            FadeTransition(
+              opacity: _animation,
+              child: ToolTipWidget(
+                position: position,
+                offset: offset,
+                screenSize: screenSize,
+                title: widget.title,
+                description: widget.description,
+                titleTextStyle: widget.titleTextStyle,
+                descTextStyle: widget.descTextStyle,
+                container: widget.container,
+                tooltipColor: widget.showcaseBackgroundColor,
+                textColor: widget.textColor,
+                showArrow: widget.showArrow,
+                contentHeight: widget.height,
+                contentWidth: widget.width,
+                onTooltipTap: _getOnTooltipTap,
+                contentPadding: widget.contentPadding,
+                type: widget.type,
+              ),
             ),
           ],
         ),
       );
-}
 
-// ignore: unused_element
-class _TargetWidget extends StatelessWidget {
-  final Offset offset;
-  final Size? size;
-  final Animation<double>? widthAnimation;
-  final VoidCallback? onTap;
-  final ShapeBorder? shapeBorder;
-
-  _TargetWidget({
-    Key? key,
-    required this.offset,
-    this.size,
-    this.widthAnimation,
-    this.onTap,
-    this.shapeBorder,
-  }) : super(key: key);
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned(
-      top: offset.dy,
-      left: offset.dx,
-      child: FractionalTranslation(
-        translation: const Offset(-0.5, -0.5),
-        child: GestureDetector(
-          onTap: onTap,
-          child: Container(
-            height: size!.height + 16,
-            width: size!.width + 16,
-            decoration: ShapeDecoration(
-              shape: shapeBorder ??
-                  RoundedRectangleBorder(
-                    borderRadius: const BorderRadius.all(
-                      Radius.circular(8),
-                    ),
-                  ),
-            ),
-          ),
-        ),
-      ),
-    );
+  Rect scaleRect(Rect rect, double scale) {
+    return Rect.fromCenter(center: rect.center, width: rect.width * scale, height: rect.height * scale);
   }
 }
 
@@ -337,6 +296,9 @@ class TooltipShapeBorder extends ShapeBorder {
 
   @override
   EdgeInsetsGeometry get dimensions => EdgeInsets.only(top: arrowHeight);
+
+  @override
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) => Path();
 
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
@@ -365,10 +327,4 @@ class TooltipShapeBorder extends ShapeBorder {
 
   @override
   ShapeBorder scale(double t) => this;
-
-  @override
-  Path getInnerPath(Rect rect, {TextDirection? textDirection}) {
-    // TODO: implement getInnerPath
-    throw UnimplementedError();
-  }
 }
