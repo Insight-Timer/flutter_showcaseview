@@ -31,6 +31,7 @@ class Showcase extends StatefulWidget {
   final bool hideTooltip;
   final ArrowType type;
   final Duration animationDuration;
+  final bool? forceTooltipPositionAbove;
 
   const Showcase({
     required this.key,
@@ -52,6 +53,7 @@ class Showcase extends StatefulWidget {
     this.onToolTipClick,
     this.type = ArrowType.up,
     this.animationDuration = const Duration(milliseconds: 200),
+    this.forceTooltipPositionAbove,
   })  : height = null,
         width = null,
         container = null,
@@ -91,6 +93,7 @@ class Showcase extends StatefulWidget {
     this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
     this.type = ArrowType.up,
     this.animationDuration = const Duration(milliseconds: 200),
+    this.forceTooltipPositionAbove,
   })  : showArrow = false,
         onToolTipClick = null,
         assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0, "overlay opacity should be >= 0.0 and <= 1.0."),
