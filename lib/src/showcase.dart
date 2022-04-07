@@ -269,6 +269,7 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
                 onTooltipTap: _getOnTooltipTap,
                 contentPadding: widget.contentPadding,
                 type: widget.type,
+                forceTooltipPositionAbove: widget.forceTooltipPositionAbove,
               ),
             ),
           ],
