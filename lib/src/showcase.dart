@@ -1,41 +1,42 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
-import 'dart:async';
-import 'package:showcaseview/showcaseview.dart';
-import 'package:showcaseview/custom_paint.dart';
+import 'custom_paint.dart';
 import 'get_position.dart';
 import 'layout_overlays.dart';
+import 'showcase_widget.dart';
 import 'tooltip_widget.dart';
 
 class Showcase extends StatefulWidget {
   final Widget child;
-  final String title;
-  final String description;
-  final ShapeBorder shapeBorder;
-  final TextStyle titleTextStyle;
-  final TextStyle descTextStyle;
+  final String? title;
+  final String? description;
+  final ShapeBorder? shapeBorder;
+  final TextStyle? titleTextStyle;
+  final TextStyle? descTextStyle;
   final EdgeInsets contentPadding;
   final GlobalKey key;
   final Color overlayColor;
   final double overlayOpacity;
-  final Widget container;
+  final Widget? container;
   final Color showcaseBackgroundColor;
   final Color textColor;
-  final bool showArrow;
-  final double height;
-  final double width;
-  final VoidCallback onToolTipClick;
-  final VoidCallback onTargetClick;
-  final bool disposeOnTap;
+  final bool? showArrow;
+  final double? height;
+  final double? width;
+  final VoidCallback? onToolTipClick;
+  final VoidCallback? onTargetClick;
+  final bool? disposeOnTap;
   final bool hideTooltip;
   final ArrowType type;
   final Duration animationDuration;
 
   const Showcase({
-    @required this.key,
-    @required this.child,
+    required this.key,
+    required this.child,
     this.title,
-    @required this.description,
+    required this.description,
     this.shapeBorder,
     this.overlayColor = Colors.black,
     this.overlayOpacity = 0.75,
@@ -60,26 +61,21 @@ class Showcase extends StatefulWidget {
         assert(disposeOnTap == null ? true : (onTargetClick == null ? false : true),
             "onTargetClick is required if you're using disposeOnTap"),
         assert(
-          key != null ||
-              child != null ||
-              title != null ||
+          title != null ||
               showArrow != null ||
               description != null ||
               shapeBorder != null ||
-              overlayColor != null ||
               titleTextStyle != null ||
               descTextStyle != null ||
-              showcaseBackgroundColor != null ||
-              textColor != null ||
               shapeBorder != null,
         );
 
   const Showcase.withWidget({
-    this.key,
-    @required this.child,
-    @required this.container,
-    @required this.height,
-    @required this.width,
+    required this.key,
+    required this.child,
+    required this.container,
+    required this.height,
+    required this.width,
     this.title,
     this.description,
     this.shapeBorder,
@@ -95,20 +91,14 @@ class Showcase extends StatefulWidget {
     this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
     this.type = ArrowType.up,
     this.animationDuration = const Duration(milliseconds: 200),
-  })  : this.showArrow = false,
-        this.onToolTipClick = null,
+  })  : showArrow = false,
+        onToolTipClick = null,
         assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0, "overlay opacity should be >= 0.0 and <= 1.0."),
-        assert(key != null ||
-            child != null ||
-            title != null ||
+        assert(title != null ||
             description != null ||
             shapeBorder != null ||
-            overlayColor != null ||
             titleTextStyle != null ||
-            descTextStyle != null ||
-            showcaseBackgroundColor != null ||
-            textColor != null ||
-            shapeBorder != null);
+            descTextStyle != null);
 
   @override
   _ShowcaseState createState() => _ShowcaseState();
@@ -116,10 +106,10 @@ class Showcase extends StatefulWidget {
 
 class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
   bool _showShowCase = false;
-  Timer timer;
-  GetPosition position;
-  AnimationController _controller;
-  Animation<double> _animation;
+  Timer? timer;
+  late GetPosition position;
+  late AnimationController _controller;
+  late Animation<double> _animation;
 
   @override
   void initState() {
@@ -155,30 +145,31 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
   /// show overlay if there is any target widget
   ///
   void showOverlay() {
-    GlobalKey activeStep = ShowCaseWidget.activeTargetWidget(context);
+    final activeStep = ShowCaseWidget.activeTargetWidget(context);
     setState(() {
       _showShowCase = activeStep == widget.key;
     });
 
     if (activeStep == widget.key) {
-      if (ShowCaseWidget.of(context).autoPlay) {
-        timer = Timer(Duration(seconds: ShowCaseWidget.of(context).autoPlayDelay.inSeconds), () {
+      final showCaseWidget = ShowCaseWidget.of(context);
+      if (showCaseWidget != null && showCaseWidget.autoPlay) {
+        timer = Timer(Duration(seconds: showCaseWidget.autoPlayDelay.inSeconds), () {
           _nextIfAny();
         });
       }
     }
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => _controller.forward(from: 0));
+    WidgetsBinding.instance?.addPostFrameCallback((_) => _controller.forward(from: 0));
   }
 
-  void hideOverlay(VoidCallback callback) {
+  void hideOverlay(VoidCallback? callback) {
     _controller.reverse();
-    Future.delayed(widget.animationDuration).then((value) => callback?.call());
+    Future<void>.delayed(widget.animationDuration).then((_) => callback?.call());
   }
 
   @override
   Widget build(BuildContext context) {
-    Size size = MediaQuery.of(context).size;
+    final size = MediaQuery.of(context).size;
     return _showShowCase
         ? AnchoredOverlay(
             overlayBuilder: (BuildContext context, Rect rectBound, Offset offset) =>
@@ -190,37 +181,38 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
   }
 
   void _nextIfAny() {
-    if (timer != null && timer.isActive) {
-      if (ShowCaseWidget.of(context).autoPlayLockEnable) {
+    if (timer != null && timer!.isActive) {
+      final showcaseWidget = ShowCaseWidget.of(context);
+      if (showcaseWidget != null && showcaseWidget.autoPlayLockEnable) {
         return;
       }
-      timer.cancel();
-    } else if (timer != null && !timer.isActive) {
+      timer?.cancel();
+    } else if (timer != null && !timer!.isActive) {
       timer = null;
     }
     hideOverlay(() {
-      ShowCaseWidget.of(context).completed(widget.key);
+      ShowCaseWidget.of(context)?.completed(widget.key);
     });
   }
 
   // ignore: unused_element
   void _getOnTargetTap() {
     if (widget.disposeOnTap == true) {
-      ShowCaseWidget.of(context).dismiss();
-      widget.onTargetClick();
+      ShowCaseWidget.of(context)?.dismiss();
+      widget.onTargetClick?.call();
     } else {
-      (widget.onTargetClick ?? _nextIfAny)?.call();
+      (widget.onTargetClick ?? _nextIfAny).call();
     }
   }
 
   void _getOnTooltipTap() {
     if (widget.disposeOnTap == true) {
-      ShowCaseWidget.of(context).dismiss();
+      ShowCaseWidget.of(context)?.dismiss();
     }
     widget.onToolTipClick?.call();
   }
 
-  buildOverlayOnTarget(
+  Widget buildOverlayOnTarget(
     Offset offset,
     Size size,
     Rect rectBound,
@@ -306,10 +298,10 @@ class TooltipShapeBorder extends ShapeBorder {
   EdgeInsetsGeometry get dimensions => EdgeInsets.only(top: arrowHeight);
 
   @override
-  Path getInnerPath(Rect rect, {TextDirection textDirection}) => null;
+  Path getInnerPath(Rect rect, {TextDirection? textDirection}) => Path();
 
   @override
-  Path getOuterPath(Rect rect, {TextDirection textDirection}) {
+  Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
     rect = Rect.fromPoints(rect.topLeft, rect.bottomRight - Offset(0, arrowHeight));
     // ignore: omit_local_variable_types
     double x = arrowWidth, y = arrowHeight, r = 1 - arrowArc;
@@ -331,7 +323,7 @@ class TooltipShapeBorder extends ShapeBorder {
   }
 
   @override
-  void paint(Canvas canvas, Rect rect, {TextDirection textDirection}) {}
+  void paint(Canvas canvas, Rect rect, {TextDirection? textDirection}) {}
 
   @override
   ShapeBorder scale(double t) => this;

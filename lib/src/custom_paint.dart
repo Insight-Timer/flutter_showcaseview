@@ -25,7 +25,34 @@
  * POSSIBILITY OF SUCH DAMAGE.
  */
 
-library showcaseview;
+import 'package:flutter/material.dart';
 
-export 'src/showcase.dart';
-export 'src/showcase_widget.dart';
+class ShapePainter extends CustomPainter {
+  Rect rect;
+  final ShapeBorder? shapeBorder;
+  final Color? color;
+  final double? opacity;
+
+  ShapePainter({
+    required this.rect,
+    this.color,
+    this.shapeBorder,
+    this.opacity,
+  });
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    final paint = Paint();
+    paint.color = color!.withOpacity(opacity!);
+    final outer =
+        RRect.fromLTRBR(0, 0, size.width, size.height, Radius.circular(0));
+
+    final radius = shapeBorder == CircleBorder() ? 50.0 : 3.0;
+
+    final inner = RRect.fromRectAndRadius(rect, Radius.circular(radius));
+    canvas.drawDRRect(outer, inner, paint);
+  }
+
+  @override
+  bool shouldRepaint(CustomPainter oldDelegate) => false;
+}

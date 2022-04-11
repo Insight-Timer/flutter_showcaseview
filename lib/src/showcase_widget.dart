@@ -5,8 +5,8 @@
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
  *
- * 1. Redistributions of source code must retain the above copyright notice, this
- *    list of conditions and the following disclaimer.
+ * 1. Redistributions of source code must retain the above copyright notice,
+ *    this list of conditions and the following disclaimer.
  *
  * 2. Redistributions in binary form must reproduce the above copyright notice,
  *    this list of conditions and the following disclaimer in the documentation
@@ -14,29 +14,30 @@
  *
  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
- * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
- * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
- * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
- * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
- * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
- * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE
+ * ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE
+ * LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR
+ * CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF
+ * SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS
+ * INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE)
+ * ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
+ * POSSIBILITY OF SUCH DAMAGE.
  */
 
 import 'package:flutter/material.dart';
 
 class ShowCaseWidget extends StatefulWidget {
   final Builder builder;
-  final VoidCallback onFinish;
-  final Function(int, GlobalKey) onStart;
-  final Function(int, GlobalKey) onComplete;
+  final VoidCallback? onFinish;
+  final Function(int?, GlobalKey)? onStart;
+  final Function(int?, GlobalKey)? onComplete;
   final bool autoPlay;
   final Duration autoPlayDelay;
   final bool autoPlayLockEnable;
 
   const ShowCaseWidget({
-    @required this.builder,
+    required this.builder,
     this.onFinish,
     this.onStart,
     this.onComplete,
@@ -45,13 +46,13 @@ class ShowCaseWidget extends StatefulWidget {
     this.autoPlayLockEnable = false,
   });
 
-  static activeTargetWidget(BuildContext context) {
+  static GlobalKey? activeTargetWidget(BuildContext context) {
     final widget = context.dependOnInheritedWidgetOfExactType<_InheritedShowCaseView>();
     return widget?.activeWidgetIds;
   }
 
-  static ShowCaseWidgetState of(BuildContext context) {
-    ShowCaseWidgetState state = context.findAncestorStateOfType<ShowCaseWidgetState>();
+  static ShowCaseWidgetState? of(BuildContext context) {
+    final state = context.findAncestorStateOfType<ShowCaseWidgetState>();
     if (state != null) {
       return context.findAncestorStateOfType<ShowCaseWidgetState>();
     } else {
@@ -64,41 +65,39 @@ class ShowCaseWidget extends StatefulWidget {
 }
 
 class ShowCaseWidgetState extends State<ShowCaseWidget> {
-  List<GlobalKey> ids;
-  int activeWidgetId;
-  bool autoPlay;
-  Duration autoPlayDelay;
-  bool autoPlayLockEnable;
+  List<GlobalKey>? ids;
+  int? activeWidgetId;
+  late bool autoPlay;
+  late Duration autoPlayDelay;
+  late bool autoPlayLockEnable;
 
   @override
   void initState() {
-    // ignore: todo
-    // TODO: implement initState
     super.initState();
-    this.autoPlayDelay = widget.autoPlayDelay;
-    this.autoPlay = widget.autoPlay;
-    this.autoPlayLockEnable = widget.autoPlayLockEnable;
+    autoPlayDelay = widget.autoPlayDelay;
+    autoPlay = widget.autoPlay;
+    autoPlayLockEnable = widget.autoPlayLockEnable;
   }
 
   void startShowCase(List<GlobalKey> widgetIds) {
     setState(() {
-      this.ids = widgetIds;
+      ids = widgetIds;
       activeWidgetId = 0;
       _onStart();
     });
   }
 
-  void completed(GlobalKey id) {
-    if (ids != null && ids[activeWidgetId] == id) {
+  void completed(GlobalKey? id) {
+    if (ids != null && ids![activeWidgetId!] == id) {
       setState(() {
         _onComplete();
-        ++activeWidgetId;
+        activeWidgetId = activeWidgetId! + 1;
         _onStart();
 
-        if (activeWidgetId >= ids.length) {
+        if (activeWidgetId! >= ids!.length) {
           _cleanupAfterSteps();
           if (widget.onFinish != null) {
-            widget.onFinish();
+            widget.onFinish!();
           }
         }
       });
@@ -106,19 +105,17 @@ class ShowCaseWidgetState extends State<ShowCaseWidget> {
   }
 
   void dismiss() {
-    setState(() {
-      _cleanupAfterSteps();
-    });
+    setState(_cleanupAfterSteps);
   }
 
   void _onStart() {
-    if (activeWidgetId < ids.length) {
-      widget.onStart?.call(activeWidgetId, ids[activeWidgetId]);
+    if (activeWidgetId! < ids!.length) {
+      widget.onStart?.call(activeWidgetId, ids![activeWidgetId!]);
     }
   }
 
   void _onComplete() {
-    widget.onComplete?.call(activeWidgetId, ids[activeWidgetId]);
+    widget.onComplete?.call(activeWidgetId, ids![activeWidgetId!]);
   }
 
   void _cleanupAfterSteps() {
@@ -130,17 +127,17 @@ class ShowCaseWidgetState extends State<ShowCaseWidget> {
   Widget build(BuildContext context) {
     return _InheritedShowCaseView(
       child: widget.builder,
-      activeWidgetIds: ids?.elementAt(activeWidgetId),
+      activeWidgetIds: ids?.elementAt(activeWidgetId!),
     );
   }
 }
 
 class _InheritedShowCaseView extends InheritedWidget {
-  final GlobalKey activeWidgetIds;
+  final GlobalKey? activeWidgetIds;
 
   _InheritedShowCaseView({
-    @required this.activeWidgetIds,
-    @required child,
+    required this.activeWidgetIds,
+    required Widget child,
   }) : super(child: child);
 
   @override
