@@ -31,7 +31,7 @@ class Showcase extends StatefulWidget {
   final bool hideTooltip;
   final ArrowType type;
   final Duration animationDuration;
-  final bool? forceTooltipPositionAbove;
+  final TooltipPosition? forcedTooltipPosition;
 
   const Showcase(
       {required this.key,
@@ -53,7 +53,7 @@ class Showcase extends StatefulWidget {
       this.onToolTipClick,
       this.type = ArrowType.up,
       this.animationDuration = const Duration(milliseconds: 200),
-      this.forceTooltipPositionAbove})
+      this.forcedTooltipPosition})
       : height = null,
         width = null,
         container = null,
@@ -93,7 +93,7 @@ class Showcase extends StatefulWidget {
       this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
       this.type = ArrowType.up,
       this.animationDuration = const Duration(milliseconds: 200),
-      this.forceTooltipPositionAbove})
+      this.forcedTooltipPosition})
       : showArrow = false,
         onToolTipClick = null,
         assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0, "overlay opacity should be >= 0.0 and <= 1.0."),
@@ -269,7 +269,7 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
                 onTooltipTap: _getOnTooltipTap,
                 contentPadding: widget.contentPadding,
                 type: widget.type,
-                forceTooltipPositionAbove: widget.forceTooltipPositionAbove,
+                forcedTooltipPosition: widget.forcedTooltipPosition,
               ),
             ),
           ],
@@ -282,6 +282,8 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
 }
 
 enum ArrowType { up, down }
+
+enum TooltipPosition { above, below }
 
 class TooltipShapeBorder extends ShapeBorder {
   final double arrowWidth;

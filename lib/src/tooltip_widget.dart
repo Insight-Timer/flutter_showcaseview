@@ -51,7 +51,7 @@ class ToolTipWidget extends StatefulWidget {
   final VoidCallback? onTooltipTap;
   final EdgeInsets? contentPadding;
   final ArrowType? type;
-  final bool? forceTooltipPositionAbove;
+  final TooltipPosition? forcedTooltipPosition;
 
   ToolTipWidget(
       {required this.position,
@@ -70,7 +70,7 @@ class ToolTipWidget extends StatefulWidget {
       this.onTooltipTap,
       this.contentPadding,
       this.type,
-      this.forceTooltipPositionAbove});
+      this.forcedTooltipPosition});
 
   @override
   _ToolTipWidgetState createState() => _ToolTipWidgetState();
@@ -86,8 +86,8 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
   }
 
   String findPositionForContent(Offset position) {
-    if (widget.forceTooltipPositionAbove ?? false) {
-      return 'ABOVE';
+    if (widget.forcedTooltipPosition != null) {
+      return widget.forcedTooltipPosition!.name.toUpperCase();
     }
     if (isCloseToTopOrBottom(position)) {
       return 'ABOVE';
