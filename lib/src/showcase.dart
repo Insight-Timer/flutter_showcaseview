@@ -31,28 +31,30 @@ class Showcase extends StatefulWidget {
   final bool hideTooltip;
   final ArrowType type;
   final Duration animationDuration;
+  final TooltipPosition? forcedTooltipPosition;
 
-  const Showcase({
-    required this.key,
-    required this.child,
-    this.title,
-    required this.description,
-    this.shapeBorder,
-    this.overlayColor = Colors.black,
-    this.overlayOpacity = 0.75,
-    this.titleTextStyle,
-    this.descTextStyle,
-    this.showcaseBackgroundColor = Colors.white,
-    this.textColor = Colors.black,
-    this.showArrow = true,
-    this.onTargetClick,
-    this.disposeOnTap,
-    this.hideTooltip = true,
-    this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
-    this.onToolTipClick,
-    this.type = ArrowType.up,
-    this.animationDuration = const Duration(milliseconds: 200),
-  })  : height = null,
+  const Showcase(
+      {required this.key,
+      required this.child,
+      this.title,
+      required this.description,
+      this.shapeBorder,
+      this.overlayColor = Colors.black,
+      this.overlayOpacity = 0.75,
+      this.titleTextStyle,
+      this.descTextStyle,
+      this.showcaseBackgroundColor = Colors.white,
+      this.textColor = Colors.black,
+      this.showArrow = true,
+      this.onTargetClick,
+      this.disposeOnTap,
+      this.hideTooltip = true,
+      this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
+      this.onToolTipClick,
+      this.type = ArrowType.up,
+      this.animationDuration = const Duration(milliseconds: 200),
+      this.forcedTooltipPosition})
+      : height = null,
         width = null,
         container = null,
         assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0, "overlay opacity should be >= 0.0 and <= 1.0."),
@@ -70,28 +72,29 @@ class Showcase extends StatefulWidget {
               shapeBorder != null,
         );
 
-  const Showcase.withWidget({
-    required this.key,
-    required this.child,
-    required this.container,
-    required this.height,
-    required this.width,
-    this.title,
-    this.description,
-    this.shapeBorder,
-    this.overlayColor = Colors.black,
-    this.overlayOpacity = 0.75,
-    this.titleTextStyle,
-    this.descTextStyle,
-    this.showcaseBackgroundColor = Colors.white,
-    this.textColor = Colors.black,
-    this.onTargetClick,
-    this.disposeOnTap,
-    this.hideTooltip = true,
-    this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
-    this.type = ArrowType.up,
-    this.animationDuration = const Duration(milliseconds: 200),
-  })  : showArrow = false,
+  const Showcase.withWidget(
+      {required this.key,
+      required this.child,
+      required this.container,
+      required this.height,
+      required this.width,
+      this.title,
+      this.description,
+      this.shapeBorder,
+      this.overlayColor = Colors.black,
+      this.overlayOpacity = 0.75,
+      this.titleTextStyle,
+      this.descTextStyle,
+      this.showcaseBackgroundColor = Colors.white,
+      this.textColor = Colors.black,
+      this.onTargetClick,
+      this.disposeOnTap,
+      this.hideTooltip = true,
+      this.contentPadding = const EdgeInsets.symmetric(vertical: 8),
+      this.type = ArrowType.up,
+      this.animationDuration = const Duration(milliseconds: 200),
+      this.forcedTooltipPosition})
+      : showArrow = false,
         onToolTipClick = null,
         assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0, "overlay opacity should be >= 0.0 and <= 1.0."),
         assert(title != null ||
@@ -266,6 +269,7 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
                 onTooltipTap: _getOnTooltipTap,
                 contentPadding: widget.contentPadding,
                 type: widget.type,
+                forcedTooltipPosition: widget.forcedTooltipPosition,
               ),
             ),
           ],
@@ -278,6 +282,8 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
 }
 
 enum ArrowType { up, down }
+
+enum TooltipPosition { above, below }
 
 class TooltipShapeBorder extends ShapeBorder {
   final double arrowWidth;
