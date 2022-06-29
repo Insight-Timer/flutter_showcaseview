@@ -1,7 +1,6 @@
 import 'dart:async';
 
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
 import 'custom_paint.dart';
 import 'get_position.dart';
 import 'layout_overlays.dart';
@@ -16,6 +15,7 @@ class Showcase extends StatefulWidget {
   final TextStyle? titleTextStyle;
   final TextStyle? descTextStyle;
   final EdgeInsets contentPadding;
+  @override
   final GlobalKey key;
   final Color overlayColor;
   final double overlayOpacity;
@@ -57,10 +57,17 @@ class Showcase extends StatefulWidget {
       : height = null,
         width = null,
         container = null,
-        assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0, "overlay opacity should be >= 0.0 and <= 1.0."),
-        assert(onTargetClick == null ? true : (disposeOnTap == null ? false : true),
+        assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0,
+            "overlay opacity should be >= 0.0 and <= 1.0."),
+        assert(
+            onTargetClick == null
+                ? true
+                : (disposeOnTap == null ? false : true),
             "disposeOnTap is required if you're using onTargetClick"),
-        assert(disposeOnTap == null ? true : (onTargetClick == null ? false : true),
+        assert(
+            disposeOnTap == null
+                ? true
+                : (onTargetClick == null ? false : true),
             "onTargetClick is required if you're using disposeOnTap"),
         assert(
           title != null ||
@@ -96,7 +103,8 @@ class Showcase extends StatefulWidget {
       this.forcedTooltipPosition})
       : showArrow = false,
         onToolTipClick = null,
-        assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0, "overlay opacity should be >= 0.0 and <= 1.0."),
+        assert(overlayOpacity >= 0.0 && overlayOpacity <= 1.0,
+            "overlay opacity should be >= 0.0 and <= 1.0."),
         assert(title != null ||
             description != null ||
             shapeBorder != null ||
@@ -156,18 +164,19 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
     if (activeStep == widget.key) {
       final showCaseWidget = ShowCaseWidget.of(context);
       if (showCaseWidget != null && showCaseWidget.autoPlay) {
-        timer = Timer(Duration(seconds: showCaseWidget.autoPlayDelay.inSeconds), () {
-          _nextIfAny();
-        });
+        timer = Timer(Duration(seconds: showCaseWidget.autoPlayDelay.inSeconds),
+            _nextIfAny);
       }
     }
 
-    WidgetsBinding.instance?.addPostFrameCallback((_) => _controller.forward(from: 0));
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _controller.forward(from: 0));
   }
 
   void hideOverlay(VoidCallback? callback) {
     _controller.reverse();
-    Future<void>.delayed(widget.animationDuration).then((_) => callback?.call());
+    Future<void>.delayed(widget.animationDuration)
+        .then((_) => callback?.call());
   }
 
   @override
@@ -175,7 +184,7 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
     final size = MediaQuery.of(context).size;
     return _showShowCase
         ? AnchoredOverlay(
-            overlayBuilder: (BuildContext context, Rect rectBound, Offset offset) =>
+            overlayBuilder: (context, rectBound, offset) =>
                 buildOverlayOnTarget(offset, rectBound.size, rectBound, size),
             showOverlay: _showShowCase,
             child: widget.child,
@@ -244,7 +253,8 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
                           opacity: widget.overlayOpacity,
                           rect: scaleRect(position.getRect(), _animation.value),
                           shapeBorder: widget.shapeBorder,
-                          color: widget.overlayColor.withOpacity(_animation.value),
+                          color:
+                              widget.overlayColor.withOpacity(_animation.value),
                         ),
                       ),
                     );
@@ -277,7 +287,10 @@ class _ShowcaseState extends State<Showcase> with TickerProviderStateMixin {
       );
 
   Rect scaleRect(Rect rect, double scale) {
-    return Rect.fromCenter(center: rect.center, width: rect.width * scale, height: rect.height * scale);
+    return Rect.fromCenter(
+        center: rect.center,
+        width: rect.width * scale,
+        height: rect.height * scale);
   }
 }
 
@@ -308,7 +321,8 @@ class TooltipShapeBorder extends ShapeBorder {
 
   @override
   Path getOuterPath(Rect rect, {TextDirection? textDirection}) {
-    rect = Rect.fromPoints(rect.topLeft, rect.bottomRight - Offset(0, arrowHeight));
+    rect = Rect.fromPoints(
+        rect.topLeft, rect.bottomRight - Offset(0, arrowHeight));
     // ignore: omit_local_variable_types
     double x = arrowWidth, y = arrowHeight, r = 1 - arrowArc;
     if (type == ArrowType.up) {
@@ -316,14 +330,16 @@ class TooltipShapeBorder extends ShapeBorder {
         ..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)))
         ..moveTo(rect.topLeft.dx + 56, rect.topCenter.dy)
         ..relativeLineTo(-x / 2 * r, -y * r)
-        ..relativeQuadraticBezierTo(-x / 2 * (1 - r), y * (-1 + r), -x * (1 - r), 0)
+        ..relativeQuadraticBezierTo(
+            -x / 2 * (1 - r), y * (-1 + r), -x * (1 - r), 0)
         ..relativeLineTo(-x / 2 * r, y * r);
     } else {
       return Path()
         ..addRRect(RRect.fromRectAndRadius(rect, Radius.circular(radius)))
         ..moveTo(rect.bottomLeft.dx + 38, rect.bottomCenter.dy)
         ..relativeLineTo(-x / 2 * r, y * r)
-        ..relativeQuadraticBezierTo(-x / 2 * (1 - r), y * (1 - r), -x * (1 - r), 0)
+        ..relativeQuadraticBezierTo(
+            -x / 2 * (1 - r), y * (1 - r), -x * (1 - r), 0)
         ..relativeLineTo(-x / 2 * r, -y * r);
     }
   }

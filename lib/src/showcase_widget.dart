@@ -47,7 +47,8 @@ class ShowCaseWidget extends StatefulWidget {
   });
 
   static GlobalKey? activeTargetWidget(BuildContext context) {
-    final widget = context.dependOnInheritedWidgetOfExactType<_InheritedShowCaseView>();
+    final widget =
+        context.dependOnInheritedWidgetOfExactType<_InheritedShowCaseView>();
     return widget?.activeWidgetIds;
   }
 
@@ -141,5 +142,6 @@ class _InheritedShowCaseView extends InheritedWidget {
   }) : super(child: child);
 
   @override
-  bool updateShouldNotify(_InheritedShowCaseView oldWidget) => oldWidget.activeWidgetIds != activeWidgetIds;
+  bool updateShouldNotify(_InheritedShowCaseView oldWidget) =>
+      oldWidget.activeWidgetIds != activeWidgetIds;
 }
