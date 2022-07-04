@@ -44,7 +44,8 @@ import 'package:flutter/material.dart';
 ///
 class AnchoredOverlay extends StatelessWidget {
   final bool showOverlay;
-  final Widget Function(BuildContext, Rect anchorBounds, Offset anchor)? overlayBuilder;
+  final Widget Function(BuildContext, Rect anchorBounds, Offset anchor)?
+      overlayBuilder;
   final Widget? child;
 
   AnchoredOverlay({
@@ -64,8 +65,10 @@ class AnchoredOverlay extends StatelessWidget {
             // To calculate the "anchor" point we grab the render box of
             // our parent Container and then we find the center of that box.
             final box = context.findRenderObject() as RenderBox;
-            final topLeft = box.size.topLeft(box.localToGlobal(const Offset(0.0, 0.0)));
-            final bottomRight = box.size.bottomRight(box.localToGlobal(const Offset(0.0, 0.0)));
+            final topLeft =
+                box.size.topLeft(box.localToGlobal(const Offset(0.0, 0.0)));
+            final bottomRight =
+                box.size.bottomRight(box.localToGlobal(const Offset(0.0, 0.0)));
             final anchorBounds = Rect.fromLTRB(
               topLeft.dx,
               topLeft.dy,
@@ -118,20 +121,20 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
     super.initState();
 
     if (widget.showOverlay) {
-      WidgetsBinding.instance!.addPostFrameCallback((_) => showOverlay());
+      WidgetsBinding.instance.addPostFrameCallback((_) => showOverlay());
     }
   }
 
   @override
   void didUpdateWidget(OverlayBuilder oldWidget) {
     super.didUpdateWidget(oldWidget);
-    WidgetsBinding.instance!.addPostFrameCallback((_) => syncWidgetAndOverlay());
+    WidgetsBinding.instance.addPostFrameCallback((_) => syncWidgetAndOverlay());
   }
 
   @override
   void reassemble() {
     super.reassemble();
-    WidgetsBinding.instance!.addPostFrameCallback((_) => syncWidgetAndOverlay());
+    WidgetsBinding.instance.addPostFrameCallback((_) => syncWidgetAndOverlay());
   }
 
   @override
@@ -178,7 +181,8 @@ class _OverlayBuilderState extends State<OverlayBuilder> {
   }
 
   void buildOverlay() async {
-    WidgetsBinding.instance!.addPostFrameCallback((_) => _overlayEntry?.markNeedsBuild());
+    WidgetsBinding.instance
+        .addPostFrameCallback((_) => _overlayEntry?.markNeedsBuild());
   }
 
   @override

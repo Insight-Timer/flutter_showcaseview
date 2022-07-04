@@ -121,7 +121,8 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
 
   double? _getLeft() {
     if (_isLeft()) {
-      double leftPadding = widget.position.getCenter() - (_getTooltipWidth() * 0.1);
+      var leftPadding =
+          widget.position.getCenter() - (_getTooltipWidth() * 0.1);
       if (leftPadding + _getTooltipWidth() > widget.screenSize!.width) {
         leftPadding = (widget.screenSize!.width - 20) - _getTooltipWidth();
       }
@@ -200,7 +201,8 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
               child: Material(
                 color: Colors.transparent,
                 child: Container(
-                  padding: EdgeInsets.only(top: paddingTop, bottom: paddingBottom),
+                  padding:
+                      EdgeInsets.only(top: paddingTop, bottom: paddingBottom),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(8),
                     child: GestureDetector(
@@ -214,8 +216,9 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
                           children: <Widget>[
                             Container(
                               child: Column(
-                                crossAxisAlignment:
-                                    widget.title != null ? CrossAxisAlignment.start : CrossAxisAlignment.center,
+                                crossAxisAlignment: widget.title != null
+                                    ? CrossAxisAlignment.start
+                                    : CrossAxisAlignment.center,
                                 children: <Widget>[
                                   widget.title != null
                                       ? Text(
@@ -224,7 +227,8 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
                                               Theme.of(context)
                                                   .textTheme
                                                   .headline6
-                                                  ?.merge(TextStyle(color: widget.textColor)),
+                                                  ?.merge(TextStyle(
+                                                      color: widget.textColor)),
                                         )
                                       : const SizedBox(),
                                   if (widget.description != null)
@@ -234,7 +238,8 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
                                           Theme.of(context)
                                               .textTheme
                                               .subtitle2
-                                              ?.merge(TextStyle(color: widget.textColor)),
+                                              ?.merge(TextStyle(
+                                                  color: widget.textColor)),
                                     ),
                                 ],
                               ),
@@ -273,8 +278,9 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
                             if (size == null) return;
                             if (mounted) {
                               setState(() {
-                                Offset tempPos = position;
-                                tempPos = Offset(position.dx, position.dy + size.height);
+                                var tempPos = position;
+                                tempPos = Offset(
+                                    position.dx, position.dy + size.height);
                                 position = tempPos;
                               });
                             }
@@ -294,7 +300,9 @@ class _ToolTipWidgetState extends State<ToolTipWidget> {
   Widget _getArrow(double contentOffsetMultiplier) {
     final contentFractionalOffset = contentOffsetMultiplier.clamp(-1.0, 0.0);
     return Positioned(
-      top: ToolTipWidget.isArrowUp ? widget.position.getBottom() : widget.position.getTop() - 1,
+      top: ToolTipWidget.isArrowUp
+          ? widget.position.getBottom()
+          : widget.position.getTop() - 1,
       left: widget.position.getCenter() - 24,
       child: FractionalTranslation(
         translation: Offset(0.0, contentFractionalOffset),
