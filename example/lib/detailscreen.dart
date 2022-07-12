@@ -14,6 +14,7 @@ class _DetailState extends State<Detail> {
   void initState() {
     super.initState();
     print("commit==2");
+    print("commit==3");
     WidgetsBinding.instance!.addPostFrameCallback((_) {
       Future.delayed(Duration(milliseconds: 200),
           () => ShowCaseWidget.of(myContext!)!.startShowCase([_one]));
