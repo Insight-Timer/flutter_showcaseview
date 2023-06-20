@@ -49,11 +49,11 @@ class AnchoredOverlay extends StatelessWidget {
   final Widget? child;
 
   const AnchoredOverlay({
-    Key? key,
+    super.key,
     this.showOverlay = false,
     this.overlayBuilder,
     this.child,
-  }) : super(key: key);
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -109,11 +109,11 @@ class OverlayBuilder extends StatefulWidget {
   final Widget? child;
 
   const OverlayBuilder({
-    Key? key,
+    super.key,
     this.showOverlay = false,
     this.overlayBuilder,
     this.child,
-  }) : super(key: key);
+  });
 
   @override
   State<OverlayBuilder> createState() => _OverlayBuilderState();

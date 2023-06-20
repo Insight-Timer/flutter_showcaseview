@@ -246,8 +246,8 @@ class _InheritedShowCaseView extends InheritedWidget {
 
   const _InheritedShowCaseView({
     required this.activeWidgetIds,
-    required Widget child,
-  }) : super(child: child);
+    required super.child,
+  });
 
   @override
   bool updateShouldNotify(_InheritedShowCaseView oldWidget) =>
