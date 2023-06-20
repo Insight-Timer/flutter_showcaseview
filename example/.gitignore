@@ -70,3 +70,18 @@
 !/packages/flutter_tools/test/data/dart_dependencies_test/**/.packages
 /ios/Runner.xcworkspace/xcshareddata/WorkspaceSettings.xcsettings
 pubspec.lock
+
+# Windows project.
+windows/flutter/generated_plugin_registrant.cc
+windows/flutter/generated_plugin_registrant.h
+windows/flutter/generated_plugins.cmake
+
+# Linux Project
+linux/flutter/generated_plugin_registrant.cc
+linux/flutter/generated_plugin_registrant.h
+linux/flutter/generated_plugins.cmake
+
+# macOS Project
+macos/Flutter/ephemeral/Flutter-Generated.xcconfig
+macos/Flutter/ephemeral/flutter_export_environment.sh
+macos/Flutter/GeneratedPluginRegistrant.swift
