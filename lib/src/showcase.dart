@@ -246,6 +246,13 @@ class Showcase extends StatefulWidget {
 
   final TooltipPosition? forcedTooltipPosition;
 
+  /// Optional widget drawn ON TOP of the dim overlay, given the target's global
+  /// [Rect]. Use it to render a custom highlight (e.g. a solid circle) that is
+  /// not dimmed and is not constrained by the target's own layout. The returned
+  /// widget is placed directly in the overlay [Stack], so return a positioned
+  /// widget (e.g. [Positioned]) to control its placement relative to the rect.
+  final Widget Function(Rect targetRect)? targetOverlayBuilder;
+
   const Showcase({
     required this.key,
     required this.description,
@@ -290,6 +297,7 @@ class Showcase extends StatefulWidget {
     this.descriptionTextDirection,
     this.onBarrierClick,
     this.forcedTooltipPosition,
+    this.targetOverlayBuilder,
   })  : height = null,
         width = null,
         container = null,
@@ -324,6 +332,7 @@ class Showcase extends StatefulWidget {
     this.tooltipPosition,
     this.onBarrierClick,
     this.forcedTooltipPosition,
+    this.targetOverlayBuilder,
   })  : showArrow = false,
         onToolTipClick = null,
         scaleAnimationDuration = const Duration(milliseconds: 300),
@@ -520,6 +529,8 @@ class _ShowcaseState extends State<Showcase> {
           ),
         ),
         if (_isScrollRunning) Center(child: widget.scrollLoadingWidget),
+        // Custom highlight drawn on top of the dim overlay at the target's rect.
+        if (!_isScrollRunning && widget.targetOverlayBuilder != null) widget.targetOverlayBuilder!(rectBound),
         if (!_isScrollRunning) ...[
           _TargetWidget(
             offset: offset,
